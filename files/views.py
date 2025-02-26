@@ -27,7 +27,7 @@ class S3FileListView(APIView):
     def get(self, request):
         
         try:
-            files_list = s3_client.list_objects(Bucket='esmeralda')['Contents']
+            files_list = s3_client.list_objects(Bucket=AWS_BUCKET)['Contents']
 
             return Response(files_list, status=status.HTTP_200_OK)
         except Exception as e:
@@ -84,7 +84,7 @@ class S3FileUploadView(APIView):
 class S3FileDownloadView(APIView):
     def get(self, request, file_id):
         
-        get_object_response = s3_client.get_object(Bucket=os.getenv('AWS_BUCKET'), Key=file_id)
+        get_object_response = s3_client.get_object(Bucket=AWS_BUCKET, Key=file_id)
         file_binary = get_object_response['Body'].read()
         content_type = get_object_response['ContentType']
 
