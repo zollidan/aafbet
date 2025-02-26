@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from parsers import views
+from tasks import views
 
 urlpatterns = [
     path('check-status/', views.CheckStatus.as_view()),

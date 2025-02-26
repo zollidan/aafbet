@@ -23,6 +23,8 @@ AWS_ID = os.getenv('AWS_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 AWS_BUCKET = os.getenv('AWS_BUCKET')
 
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -37,6 +39,7 @@ ALLOWED_HOSTS = []
 
 
 INSTALLED_APPS = [
+    'tasks',
     'files',
     'rest_framework',
     'django.contrib.admin',
