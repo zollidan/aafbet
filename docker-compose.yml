@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  web:
+    image: aafbet_web:latest
+    build: .
+    command: gunicorn testDeploy.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+    networks:
+      - mynetwork
+    env_file:
+      - ./aafbet/.env
+  worker:
+    image: aafbet_worker:latest
+    build: .
+    command: celery -A tasks.tasks worker --loglevel=info
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - mynetwork
+    depends_on:
+      - web
+      - redis
+
+  redis:
+    image: redis:7
+    networks:
+      - mynetwork
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+
+networks:
+  mynetwork:
+    driver: bridge
