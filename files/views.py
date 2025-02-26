@@ -4,6 +4,7 @@ import uuid
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework import generics, status
+from aafbet.settings import AWS_BUCKET
 from files.models import File
 from files.serializers import FileSerializer
 from rest_framework.views import APIView
@@ -25,9 +26,13 @@ class FileDetail(generics.RetrieveUpdateDestroyAPIView):
 class S3FileListView(APIView):
     def get(self, request):
         
-        files_list = s3_client.list_objects(Bucket=os.getenv('AWS_BUCKET'))['Contents']
-        
-        return Response(files_list)
+        try:
+            files_list = s3_client.list_objects(Bucket='esmeralda')['Contents']
+
+            return Response(files_list, status=status.HTTP_200_OK)
+        except Exception as e:
+             
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     
 class S3FileUploadView(APIView):
@@ -46,7 +51,7 @@ class S3FileUploadView(APIView):
             
             # сделать чтобы имя в s3 было случайным, а в бд сохранялост название и называние в s3
             s3_client.put_object(
-                Bucket=os.getenv('AWS_BUCKET'),
+                Bucket=AWS_BUCKET,
                 Key=file_key,
                 Body=uploaded_file.read(),
                 ContentType=uploaded_file.content_type
