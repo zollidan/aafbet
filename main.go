@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/zollidan/aafbet/db"
 	"github.com/zollidan/aafbet/routes"
 )
 
@@ -15,6 +16,8 @@ func main() {
 		log.Fatal("Failed to open log file:", err)
 	}
 	log.SetOutput(file_log)
+
+	db.Connect()
 
     app := fiber.New(fiber.Config{
 		AppName: "aafbet API 0.0.1",
