@@ -28,6 +28,7 @@ func main() {
     routes.APIConnectionCheck(api)
 	routes.APIS3(api)
 	routes.APIDatabase(api)
+	routes.APICelery(api)
 	
 
     log.Fatalln(app.Listen("127.0.0.1:3000"))
