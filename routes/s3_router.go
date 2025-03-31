@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gofiber/fiber/v2"
 	"github.com/zollidan/aafbet/s3client"
@@ -35,31 +36,34 @@ func APIS3(api fiber.Router) {
 		return c.JSON(files)
 	}) 
 
-	api.Get("/s3/files/:file_key", func(c *fiber.Ctx) error {
+	api.Get("/s3/files/:file_id", func(c *fiber.Ctx) error {
 
-		// fileID := c.Params("file_id")
-		// client := s3client.GetClient()
+		fileID := c.Params("file_id")
+		client := s3client.GetClient()
 	
-		// output, err := client.GetObject(context.TODO(), &s3.GetObjectInput{
-		// 	Bucket: &[]string{os.Getenv("AWS_BUCKET")}[0],
-		// 	Key:    &fileID,
-		// })
-		// if err != nil {
-		// 	return c.Status(500).SendString("Ошибка при получении файла: " + err.Error())
-		// }
-		// defer output.Body.Close()
-	
-		// buf := make([]byte, output.ContentLength)
-		// _, err = output.Body.Read(buf)
-		// if err != nil {
-		// 	return c.Status(500).SendString("Ошибка чтения файла: " + err.Error())
-		// }
-	
-		// c.Type(*output.ContentType)
-		// return c.Send(buf)
+		output, err := client.GetObject(context.TODO(), &s3.GetObjectInput{
+			Bucket: aws.String(os.Getenv("AWS_BUCKET")),
+			Key:    aws.String(fileID),
+		})
+		if err != nil {
+			return c.Status(500).SendString("Ошибка при получении файла: " + err.Error())
+		}
+
+		c.Set(fiber.HeaderContentType, *output.ContentType)
+
+		return c.SendStream(output.Body)
+		
+	})
+
+	api.Post("/s3/files/upload", func (c *fiber.Ctx) error {
+		
+		file, err := c.FormFile("document")
+		if err != nil {
+			return err
+		}
 
 		return c.JSON(fiber.Map{
-			"input": "hello",
+			"file name": file.Filename,
 		})
 	})
 }
